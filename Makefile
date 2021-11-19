@@ -12,7 +12,11 @@ build:
 	go build -o ${BINARY}
 
 release:
-	goreleaser release --rm-dist --snapshot --skip-publish  --skip-sign
+	docker run --rm \
+      -v $(PWD):/go/src/github.com/$(NAMESPACE)/$(BINARY) \
+	  -w /go/src/github.com/$(NAMESPACE)/$(BINARY) \
+	  -e GITHUB_TOKEN \
+      goreleaser/goreleaser release --rm-dist
 
 #      -v /var/run/docker.sock:/var/run/docker.sock
 # -e GITHUB_TOKEN --privileged
