@@ -1,5 +1,5 @@
 TEST?=$$(go list ./... | grep -v 'vendor')
-HOSTNAME=facile.it
+HOSTNAME=hashicorp.com
 NAMESPACE=alexmanno
 NAME=harbor
 BINARY=terraform-provider-${NAME}
@@ -16,24 +16,15 @@ release:
       -v $(PWD):/go/src/github.com/$(NAMESPACE)/$(BINARY) \
 	  -w /go/src/github.com/$(NAMESPACE)/$(BINARY) \
 	  -e GITHUB_TOKEN \
+	  -e GPG_FINGERPRINT \
       goreleaser/goreleaser release --rm-dist
 
-#      -v /var/run/docker.sock:/var/run/docker.sock
-# -e GITHUB_TOKEN --privileged
 
 pre-release:
 	docker run --rm \
       -v $(PWD):/go/src/github.com/$(NAMESPACE)/$(BINARY) \
       -w /go/src/github.com/$(NAMESPACE)/$(BINARY) \
       goreleaser/goreleaser release --snapshot --rm-dist
-
-pre-build:
-	docker run --rm --privileged \
-      -v $(PWD):/go/src/github.com/$(NAMESPACE)/$(BINARY) \
-      -v /var/run/docker.sock:/var/run/docker.sock \
-      -w /go/src/github.com/$(NAMESPACE)/$(BINARY) \
-      -e GITHUB_TOKEN \
-      goreleaser/goreleaser build --single-target
 
 install: build
 	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
